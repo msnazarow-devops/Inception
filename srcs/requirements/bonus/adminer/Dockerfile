@@ -6,19 +6,18 @@
 #    By: sgertrud <msnazarow@gmail.com>             +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/06/24 03:36:49 by sgertrud          #+#    #+#              #
-#    Updated: 2021/01/18 09:00:23 by sgertrud         ###   ########.fr        #
+#    Updated: 2021/01/17 09:33:14 by sgertrud         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 FROM alpine:3.12
-EXPOSE 80 443
-ARG nginx_location="/etc/nginx/conf.d/default.conf"
-ENV nginx_location="${nginx_location}"
-RUN apk update && apk  upgrade
-RUN apk add -q --no-cache nginx wget openssl openssh
-RUN	openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt -subj "/C=RU/ST=Moscow/L=Moscow/O=School 21/CN=sgertrud"
-COPY srcs/ .
-RUN mv localhost.conf "${nginx_location}"
-RUN mkdir /run/nginx/
-RUN echo -e "admin\nadmin" | adduser msnazarow && ssh-keygen -A
-CMD ["sh", "mysupervisor.sh"]
+EXPOSE 8080
+RUN apk  update && apk  upgrade
+RUN apk add -q --no-cache wget php-fpm mysql-client
+RUN apk add -q --no-cache php-common php-xmlrpc php-soap php-gd php-intl php-cli php-ldap php-zip php-curl php-phar php-json php-mysqli php-mbstring php-phar php-sodium php-openssl pcre php-dom php-exif php-fileinfo php-session
+WORKDIR /etc/setup
+RUN wget -q https://github.com/vrana/adminer/releases/download/v4.8.1/adminer-4.8.1.php -O index.php
+RUN mkdir -p /var/run/php
+RUN echo "clear_env = no" >>/etc/php7/php-fpm.conf && echo "clear_env = no" >>/etc/php7/php-fpm.d/www.conf
+RUN sed -i "s/listen = 127.0.0.1:9000/listen = adminer:8080/" /etc/php7/php-fpm.d/www.conf
+CMD [ "php", "-S", "0.0.0.0:8080", "-t", "/etc/setup/" ]

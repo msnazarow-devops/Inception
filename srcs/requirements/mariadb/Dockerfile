@@ -5,23 +5,17 @@
 #                                                     +:+ +:+         +:+      #
 #    By: sgertrud <msnazarow@gmail.com>             +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2021/01/17 13:06:53 by sgertrud          #+#    #+#              #
-#    Updated: 2021/01/18 18:41:40 by sgertrud         ###   ########.fr        #
+#    Created: 2020/06/24 03:36:49 by sgertrud          #+#    #+#              #
+#    Updated: 2021/01/17 09:33:14 by sgertrud         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 FROM alpine:3.12
-
-WORKDIR /usr/share/grafana
-
-RUN apk update
-RUN apk add grafana --repository http://nl.alpinelinux.org/alpine/edge/community/
-
-#COPY dashboards/ /usr/share/grafana/public/dashboards/
-
-EXPOSE 3000
-COPY srcs/dashboards.yml /usr/share/grafana/conf/provisioning/dashboards/
-COPY srcs/datasources.yml /usr/share/grafana/conf/provisioning/datasources/
-COPY srcs/custom.ini /usr/share/grafana/conf
-COPY srcs/all_dashes.json /usr/share/grafana/public/dashboards/home.json
-CMD ["grafana-server", "web"]
+EXPOSE 3606
+RUN apk update && apk upgrade
+RUN apk add -q --no-cache wget mysql mysql-client procps openrc
+COPY tools/ .
+RUN chmod +x *.sh
+RUN sed -i "s/\[mysqld\]$/\[mysqld\]\nbind-address = 0.0.0.0/" /etc/my.cnf
+RUN sed -i "s|!includedir /etc/my.cnf.d$|#!includedir /etc/my.cnf.d|" /etc/my.cnf
+CMD [ "sh", "mysql.sh"]

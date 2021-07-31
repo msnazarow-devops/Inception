@@ -6,16 +6,19 @@
 #    By: sgertrud <msnazarow@gmail.com>             +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/06/24 03:36:49 by sgertrud          #+#    #+#              #
-#    Updated: 2021/01/17 09:33:14 by sgertrud         ###   ########.fr        #
+#    Updated: 2021/01/18 09:00:23 by sgertrud         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 FROM alpine:3.12
-EXPOSE 3606
-RUN apk update && apk upgrade
-RUN apk add -q --no-cache wget mysql mysql-client procps openrc
-COPY srcs/ .
-RUN chmod +x *.sh
-RUN sed -i "s/\[mysqld\]$/\[mysqld\]\nbind-address = 0.0.0.0/" /etc/my.cnf
-RUN sed -i "s|!includedir /etc/my.cnf.d$|#!includedir /etc/my.cnf.d|" /etc/my.cnf
-CMD [ "sh", "mysql.sh"]
+EXPOSE 443
+ARG nginx_location="/etc/nginx/conf.d/default.conf"
+ENV nginx_location="${nginx_location}"
+RUN apk update && apk  upgrade
+RUN apk add -q --no-cache nginx
+COPY tools/ .
+RUN mv localhost.conf "${nginx_location}"
+RUN mv nginx-selfsigned.key /etc/ssl/private/nginx-selfsigned.key
+RUN mv nginx-selfsigned.crt /etc/ssl/certs/nginx-selfsigned.crt
+RUN mkdir /run/nginx/
+CMD ["nginx", "-g", "daemon off;"]

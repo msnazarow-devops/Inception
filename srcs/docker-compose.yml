@@ -2,7 +2,9 @@ version: '3.9'
 
 services:
     nginx:
-        build: srcs/nginx
+        build: requirements/nginx
+        image: nginx
+        container_name: nginx
         depends_on:
             - wordpress
         restart: always
@@ -13,9 +15,11 @@ services:
         networks:
             - inception
         env_file: 
-            - "srcs/.conf"
+            - ".env"
     mariadb:
-        build: srcs/mariadb
+        build: requirements/mariadb
+        image: mariadb
+        container_name: mariadb
         restart: always
         volumes: 
             - ./inception/mysql:/var/lib/mysql
@@ -23,9 +27,11 @@ services:
         networks:
           - inception
         env_file: 
-            - "srcs/.conf"
+            - ".env"
     wordpress:
-        build: srcs/wordpress
+        build: requirements/wordpress
+        image: wordpress
+        container_name: wordpress
         depends_on:
             - mariadb
         volumes: 
@@ -34,9 +40,11 @@ services:
         networks:
             - inception
         env_file: 
-            - "srcs/.conf"
+            - ".env"
     ftps:
-        build: srcs/ftps
+        build: requirements/bonus/ftps
+        image: ftps
+        container_name: ftps
         depends_on:
             - wordpress
         restart: always
@@ -45,37 +53,56 @@ services:
         volumes: 
             - ./inception/wordpress:/home/msnazarow/wordpress
         env_file: 
-            - "srcs/.conf"
+            - ".env"
         ports:
-            - "41234:41234"
+            - ${FTPPORT}:${FTPPORT}
             - "21:21"
             - "22:22"
     adminer:
-        build: srcs/adminer
+        build: requirements/bonus/adminer
+        image: adminer
+        container_name: adminer
         networks:
             - inception
         restart: always
         ports:
           - 8080:8080
         env_file:
-            - "srcs/.conf"
+            - ".env"
     grafana:
-        build: srcs/grafana
+        build: requirements/bonus/grafana
+        depends_on: 
+            - influxdb
+        image: grafana
+        container_name: grafana
         networks:
             - inception
         restart: always
         ports:
           - 3000:3000
         env_file:
-            - "srcs/.conf"
+            - ".env"
     influxdb:
-        build: srcs/influxdb
+        build: requirements/bonus/influxdb
+        image: influxdb
+        container_name: influxdb
         networks:
             - inception
         volumes: 
-           - /var/run/docker.sock:/var/run/docker.sock 
+            - ./inception/influxdb:/root/.influxdb/
+            - /var/run/docker.sock:/var/run/docker.sock 
         restart: always
         env_file:
-            - "srcs/.conf"
+            - ".env"
+    mycoolsite:
+        build: requirements/bonus/mycoolsite
+        image: mycoolsite
+        container_name: mycoolsite
+        networks: 
+            - "inception"
+        restart: always
+        ports: 
+            - "5050:5050"
 networks:
-  inception:
+    inception:
+        name: "inception"

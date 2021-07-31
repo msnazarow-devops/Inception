@@ -1,11 +1,7 @@
 #!/bin/sh
 
-sed -i -e "s/\$server_port/$server_port/" "${nginx_location}"
-sed -i -e "s/\$WPPORT/$WPPORT/" "${nginx_location}"
-sed -i -e "s/\$PMAPORT/$PMAPORT/" "${nginx_location}"
-
 # Start the first process
-/usr/sbin/sshd
+php-fpm7
 status=$?
 if [ $status -ne 0 ]; then
   echo "Failed to start php: $status"
@@ -13,7 +9,7 @@ if [ $status -ne 0 ]; then
 fi
 
 # Start the second process
-nginx
+redis-server --daemonize yes
 status=$?
 if [ $status -ne 0 ]; then
   echo "Failed to start nginx: $status"
@@ -26,10 +22,11 @@ fi
 # if it detects that either of the processes has exited.
 # Otherwise it loops forever, waking up every 60 seconds
 
+
 while sleep 60; do
-  ps aux |grep sshd |grep -q -v grep
+  ps aux |grep php |grep -q -v grep
   PROCESS_1_STATUS=$?
-  ps aux |grep nginx |grep -q -v grep
+  ps aux |grep redis |grep -q -v grep
   PROCESS_2_STATUS=$?
   # If the greps above find anything, they exit with 0 status
   # If they are not both 0, then something is wrong

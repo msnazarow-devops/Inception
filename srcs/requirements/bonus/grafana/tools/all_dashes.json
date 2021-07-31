@@ -126,7 +126,7 @@
 			  {
 				"key": "container_name",
 				"operator": "=",
-				"value": "inception_wordpress_1"
+				"value": "wordpress"
 			  }
 			]
 		  }
@@ -242,7 +242,7 @@
 			  {
 				"key": "container_name",
 				"operator": "=",
-				"value": "inception_nginx_1"
+				"value": "nginx"
 			  }
 			]
 		  }
@@ -358,7 +358,7 @@
 			  {
 				"key": "container_name",
 				"operator": "=",
-				"value": "inception_adminer_1"
+				"value": "adminer"
 			  }
 			]
 		  }
@@ -474,7 +474,7 @@
 			  {
 				"key": "container_name",
 				"operator": "=",
-				"value": "inception_mariadb_1"
+				"value": "mariadb"
 			  }
 			]
 		  }
