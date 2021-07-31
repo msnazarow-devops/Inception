@@ -1,19 +1,18 @@
 #!/bin/sh
-mv influxd.conf /etc/influxdb.conf
-mv kube_inventory.conf /etc/telegraf.conf.d/kube_inventory.conf
-mv kubernetes.conf /etc/telegraf.conf.d/kubernetes.conf
+mv influxdb.conf /etc/influxdb.conf
+mv  telegraf.conf /etc/telegraf.conf.d/
 # Start the first process
 telegraf --config /etc/telegraf.conf --config-directory /etc/telegraf.conf.d &
 status=$?
 if [ $status -ne 0 ]; then
-  echo "Failed to start php: $status"
+  echo "Failed to start telegraf: $status"
   exit $status
 fi
 # Start the second process
 influxd &
 status=$?
 if [ $status -ne 0 ]; then
-  echo "Failed to start nginx: $status"
+  echo "Failed to start influxd: $status"
   exit $status
 fi
 # Naive check runs checks once a minute to see if either of the processes exited.

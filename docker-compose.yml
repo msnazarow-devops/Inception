@@ -72,6 +72,8 @@ services:
         build: srcs/influxdb
         networks:
             - inception
+        volumes: 
+           - /var/run/docker.sock:/var/run/docker.sock 
         restart: always
         env_file:
             - "srcs/.conf"

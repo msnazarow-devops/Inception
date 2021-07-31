@@ -16,5 +16,6 @@ RUN apk update
 RUN apk add influxdb curl jq
 RUN apk add telegraf --repository http://nl.alpinelinux.org/alpine/edge/community/
 COPY srcs/ .
-
+# RUN ./usr/bin/telegraf -sample-config --input-filter docker \
+# --output-filter influxdb > /etc/telegraf.conf
 CMD ["sh", "mysupervisor.sh"]

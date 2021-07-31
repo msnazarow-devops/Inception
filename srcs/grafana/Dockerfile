@@ -23,5 +23,5 @@ EXPOSE 3000
 COPY srcs/dashboards.yml /usr/share/grafana/conf/provisioning/dashboards/
 COPY srcs/datasources.yml /usr/share/grafana/conf/provisioning/datasources/
 COPY srcs/custom.ini /usr/share/grafana/conf
-COPY srcs/dashboards /usr/share/grafana/public/dashboards/
+COPY srcs/all_dashes.json /usr/share/grafana/public/dashboards/home.json
 CMD ["grafana-server", "web"]
