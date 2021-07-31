@@ -1,0 +1,79 @@
+version: '3.9'
+
+services:
+    nginx:
+        build: srcs/nginx
+        depends_on:
+            - wordpress
+        restart: always
+        volumes: 
+            - ./inception/wordpress:/etc/setup/wordpress
+        ports:
+            - "443:443"
+        networks:
+            - inception
+        env_file: 
+            - "srcs/.conf"
+    mariadb:
+        build: srcs/mariadb
+        restart: always
+        volumes: 
+            - ./inception/mysql:/var/lib/mysql
+            - ./inception/cgroup:/sys/fs/cgroup
+        networks:
+          - inception
+        env_file: 
+            - "srcs/.conf"
+    wordpress:
+        build: srcs/wordpress
+        depends_on:
+            - mariadb
+        volumes: 
+            - ./inception/wordpress:/etc/setup/wordpress
+        restart: always
+        networks:
+            - inception
+        env_file: 
+            - "srcs/.conf"
+    ftps:
+        build: srcs/ftps
+        depends_on:
+            - wordpress
+        restart: always
+        networks:
+            - inception
+        volumes: 
+            - ./inception/wordpress:/home/msnazarow/wordpress
+        env_file: 
+            - "srcs/.conf"
+        ports:
+            - "41234:41234"
+            - "21:21"
+            - "22:22"
+    adminer:
+        build: srcs/adminer
+        networks:
+            - inception
+        restart: always
+        ports:
+          - 8080:8080
+        env_file:
+            - "srcs/.conf"
+    grafana:
+        build: srcs/grafana
+        networks:
+            - inception
+        restart: always
+        ports:
+          - 3000:3000
+        env_file:
+            - "srcs/.conf"
+    influxdb:
+        build: srcs/influxdb
+        networks:
+            - inception
+        restart: always
+        env_file:
+            - "srcs/.conf"
+networks:
+  inception:
