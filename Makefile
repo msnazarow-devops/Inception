@@ -6,6 +6,6 @@ clean:
 	docker-compose -f ./srcs/docker-compose.yml --env-file ./srcs/.env down -v 
 	docker container prune -f
 fclean: clean
-	sudo rm -rf inception/*
+	sudo rm -rf srcs/inception/*
 
 re: fclean all
